@@ -26,3 +26,5 @@ dist-ssr
 #modules
 
 node_modules
+
+.env
