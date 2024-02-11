@@ -5,7 +5,6 @@ import jwt from 'jsonwebtoken'
 import prisma from '../index'
 import { isAuthenticated } from '../middleware'
 
-
 const router = express.Router()
 
 //signup
@@ -14,13 +13,12 @@ const { username, password ,role } = req.body
     try {
         const userExist = await prisma.user.findFirst({where:{username:username}})
 if(userExist){
-    return res.json({
-        status:400, 
+    return res.status(400).json({
         message:"User already exist" 
     })
 }
 const hashedPassword = await bcrypt.hash(password,10)
-const randomBalance = Number(1+ Math.random() * 2000)
+const randomBalance = Number(500+ Math.random() * 2000)
 const finalBalance= Number(randomBalance.toFixed(2))
 const user = await prisma.user.create({
     data:{
@@ -36,17 +34,17 @@ const user = await prisma.user.create({
          })
     const secretToken:string = process.env.SECRET_KEY as string
     const token  = jwt.sign({user:user.id},secretToken)
-    res.json({ 
-        status:200,
+    res.status(200).json({ 
         success:true, 
+        message:"Successfully Signed Up",
         user,
         token
     })
     } catch (error) {
-        return res.json({
+        return res.status(400).json({
             success:false,
             message:"Something went wrong",
-            status:400
+            
         })
     }
 })
@@ -63,58 +61,59 @@ router.post('/signin',async(req:Request,res:Response)=>{
             }
         })
         if(!user){
-            return res.json({
+            return res.status(400).json({
                 success:false,
-                message:"User does not exist",
-                status:400
+                message:"User does not exist"
             })
         }
         const isPasswordTrue = await bcrypt.compare(password,user.password)
     
         if(!isPasswordTrue){
-            return res.json({
+            return res.status(400).json({
                 success:false,
-                message:"Password does not match",
-                status:400
-            }) 
+                message:"Password does not match"
+            })
         }
         const secretToken:string = process.env.SECRET_KEY as string
         const token  = jwt.sign({user:user.id},secretToken,{
             expiresIn:'5d'
         }) 
-        return res.json({
+        return res.status(200).json({
             success:true,
             user,
-            token,
-            status:200
+            message:"Successfully logged in",
+            token
         })
     } catch (error) {
-        return res.json({
+        return res.status(400).json({
             success:false,
             message:"Something went wrong",
-            status:400
         })
     }
 })
 
 router.post('/bulk', isAuthenticated, async(req:Request,res:Response)=>{
+    const userID = req.user
+    if(!userID){
+        return res.status(400).json({success:false,message:"UserID not available"})
+    }
     try {
-    const  filter  = req.body.filter ?? "" as string
     const allusers = await prisma.user.findMany({
-         where:  filter ? { username:{contains:filter} } : {}
+        where:{
+            AND:[{username:{contains:req.body.filter ?? ""}},
+                { id:{not:userID}}]
+        }
     })
-    return res.json({
+    return res.status(200).json({
         success:true,
-        status:200,
         allusers
     })
    } catch (error) {
        console.log(error) 
-    return res.json({
-        status:400,
+    return res.status(400).json({
         success:false,
         message:"Something went wrong" + error
-    })    
+    })
    }
 })
 
@@ -126,17 +125,48 @@ router.post('/fetchUser',async(req:Request,res:Response)=>{
             id:userID
         }
     })
-    return res.json({
+    return res.status(200).json({
         success:true,
-        status:200,
         user
     })
     } catch (error) {
-        return res.json({
+        return res.status(400)  .json({
             success:false,
-            status:400,
-            message:"Something went wrong"
-        })        
+            message:"Something went wrong"          
+        })    
+    }
+})
+
+router.post('/fetchMyDetails', isAuthenticated, async(req:Request,res:Response)=>{
+    const userID = req.user
+     if(userID === undefined){
+        return res.status(400).json({
+          success:false,
+          message:"Failed to authenticate user",
+      })
+      }
+    try {
+    const user = await prisma.user.findFirst({
+        where:{
+            id:userID
+        },
+        select:{
+            id:true,
+            account:true,
+            role:true,
+            username:true
+        }
+        
+    })
+    return res.status(200).json({
+        success:true,
+        user
+    })
+    } catch (error) {
+        return res.status(400)  .json({
+            success:false,
+            message:"Something went wrong"          
+        })    
     }
 })
 
