@@ -3,7 +3,7 @@ import { SyntheticEvent, useEffect, useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import URL from "./utils/url"
 import toast from "react-hot-toast"
-
+import Loader from "./Loader"
 
 const Login = () => {
 
@@ -41,7 +41,10 @@ const Login = () => {
 
   },[])
   return (
-
+    
+      disable ? 
+      <Loader />
+      :
     <div className=' bg-gray-900 min-w-[100vw] min-h-[100vh]  w-[100%] h-[100%] ' >
         <div className="border-b border-yellow-300 ">
             <div className='flex' >
@@ -51,7 +54,7 @@ const Login = () => {
             </div>
         </div>
         {/* Form starts from here */}
-                <div className="w-[40vw] h-[55vh] text-white border-yellow-300 border m-auto mt-12 ">
+              <div className="w-[40vw] h-[55vh] text-white border-yellow-300 border m-auto mt-12 ">
                     <div className=" text-center text-2xl m-4"> SIGN IN  </div>
                     <form >
                        <div className="flex flex-col gap-6 " >
@@ -63,7 +66,7 @@ const Login = () => {
                     </form>
                 </div>
     </div>
-
+    
   )
 }
 

@@ -3,6 +3,7 @@ import URL from "./utils/url"
 import toast from "react-hot-toast"
 import {  useState } from "react"
 import axios from "axios"
+import Loader from "./Loader"
 
 const SignUp = () => {
 
@@ -40,7 +41,10 @@ const SignUp = () => {
   }
 
   return (
-
+    disable?
+     <Loader/>
+     :
+     
     <div className=' bg-gray-900 min-w-[100vw] min-h-[100vh]  w-[100%] h-[100%] ' >
         <div className="border-b border-yellow-300 ">
             <div className='flex' >

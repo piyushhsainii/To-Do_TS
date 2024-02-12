@@ -48,7 +48,7 @@ const Dashboard = () => {
       !Data || !User ? 
       <Loader/>
         :
-    <div className=' border l  border-yellow-300 border-opacity-30 rounded-xl  h-[80vh] m-4 m-auto p-2 w-[95vw] overflow-y-auto font-Nabla text-white text-[28px] ' > 
+    <div className=' border l  border-yellow-300 border-opacity-30 rounded-xl  h-[80vh]  m-auto p-2 w-[95vw] overflow-y-auto font-Nabla text-white text-[28px] ' > 
     <div className='flex justify-between'>
     <div className='m-3'> Send Money To : </div>        
     <div className='m-3 flex gap-6'> <div>Balance : {User !== null ? User.account.balance : null } </div>  <div><img src="/coin.png" className='h-[25px] w-[25px] mt-2.5' alt="" /></div> </div>
